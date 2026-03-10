@@ -141,5 +141,22 @@ void Rational::simplify() {
     }
 }
 
+Rational *getRoots(double a, double b, double c, int &cnt) {
+    double disc = b * b - 4 * a * c;
+    if (disc < 0) return nullptr;
+
+    Rational *roots = new Rational[2];
+    if (disc == 0) {
+        cnt = 1;
+        roots[0] = Rational(-b / (2 * a));
+    }
+    else {
+        cnt = 2;
+        roots[0] = Rational((-b  + sqrt(disc)) / (2 * a));
+        roots[1] = Rational((-b  - sqrt(disc)) / (2 * a));
+    }
+    return roots;
+}
+
 
 

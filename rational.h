@@ -2,8 +2,6 @@
 #include<iostream>
 using namespace std;
 
-int gcd(int a, int b);
-
 class Rational {
 	int numer, denom;
 	void simplify();
@@ -36,3 +34,12 @@ public:
 	friend istream &operator >> (istream &is, Rational &r);
 	friend ostream &operator << (ostream &os, const Rational &r);
 };
+
+int gcd(int a, int b);
+Rational *getRoots(double a, double b, double c, int &cnt);
+
+template <class t>
+double cinArgument(t &number) {
+	cin >> number;
+	return double(number);
+}
