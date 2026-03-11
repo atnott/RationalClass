@@ -18,8 +18,8 @@ Rational::Rational(int numerator, int denominator) {
 }
 
 Rational::Rational(double number) {
-    numer = round(number * 1000000);
-    denom = 1000000;
+    numer = round(number * 10000);
+    denom = 10000;
     simplify();
 }
 
@@ -73,6 +73,11 @@ Rational Rational::operator / (const Rational &other) const {
     return temp /= other;
 }
 
+Rational Rational::operator * (double other) const {
+    Rational temp(*this);
+    return temp *= Rational(other);
+}
+
 Rational &Rational::operator ++ () {
     numer += denom;
     return *this;
@@ -91,6 +96,14 @@ bool Rational::operator == (const Rational &other) const {
 bool Rational::operator != (const Rational &other) const {
     return !(numer == other.numer && denom == other.denom);
 }
+
+bool Rational::operator > (const Rational &other) const {
+    return (long long)numer * other.denom > (long long)denom * other.numer;
+}
+
+bool Rational::operator < (const Rational &other) const {
+    return !((long long)numer * other.denom > (long long)denom * other.numer);
+};
 
 Rational::operator double() const {
 	return double(numer) / denom;
@@ -114,8 +127,8 @@ istream& operator >> (std::istream& is, Rational& r) {
 }
 
 ostream &operator << (ostream &os, const Rational &r) {
-	if (r.denom == 1 || r.numer == 0) os << r.numer << endl;
-    else os << r.numer << '/' << r.denom << endl;
+	if (r.denom == 1 || r.numer == 0) os << r.numer;
+    else os << r.numer << '/' << r.denom;
 	return os;
 }
 
@@ -131,6 +144,14 @@ int gcd(int a, int b) {
     return 1;
 }
 
+int Rational::getNumer() const {
+    return numer;
+}
+
+int Rational::getDenom() const {
+    return denom;
+}
+
 void Rational::simplify() {
     if (denom < 0) {
         numer = -numer; denom = -denom;
@@ -141,22 +162,51 @@ void Rational::simplify() {
     }
 }
 
-Rational *getRoots(double a, double b, double c, int &cnt) {
-    double disc = b * b - 4 * a * c;
-    if (disc < 0) return nullptr;
-
-    Rational *roots = new Rational[2];
-    if (disc == 0) {
-        cnt = 1;
-        roots[0] = Rational(-b / (2 * a));
-    }
-    else {
-        cnt = 2;
-        roots[0] = Rational((-b  + sqrt(disc)) / (2 * a));
-        roots[1] = Rational((-b  - sqrt(disc)) / (2 * a));
-    }
-    return roots;
+Rational abs(const Rational& r) {
+    return Rational(abs(r.getNumer()), r.getDenom());
 }
 
+Rational Rational::sqrt(Rational &S) {
+    if (S.getNumer() < 0) return -1;
+    if (S.getNumer() == 0) return 0;
 
+    if ((std::sqrt(S.getNumer()) * std::sqrt(S.getNumer()) == S.getNumer()) && (std::sqrt(S.getDenom()) * std::sqrt(S.getDenom()) == S.getDenom())) {
+        int num = std::sqrt(S.getNumer()), den = std::sqrt(S.getDenom());
+        return Rational(num, den);
+    }
 
+    Rational x = S, temp;
+    do {
+        temp = x;
+        x = (x + S / x) / 2;
+        x.simplify();
+    } while (abs(temp - x) > 0.001);
+    return x;
+}
+
+Rational* Rational::getRoots(Rational &a, Rational &b, Rational &c, int &cnt) {
+    Rational D = b * b - (a * c * 4);
+    if (D.getNumer() < 0) {
+        cout << "not roots" << endl;
+        return nullptr;
+    }
+    if (a.getNumer() != 0) {
+        Rational *roots = new Rational[2];
+        if (D == 0) {
+            cnt = 1;
+            roots[0] = -b / (a * 2);
+        }
+        else {
+            cnt = 2;
+            roots[0] = (-b + Rational::sqrt(D)) / (a * 2);
+            roots[1] = (-b - Rational::sqrt(D)) / (a * 2);
+        }
+        return roots;
+    }
+    else {
+        Rational *roots = new Rational[1];
+        cnt = 1;
+        roots[0] = -c / b;
+        return roots;
+    }
+}

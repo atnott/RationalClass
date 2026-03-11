@@ -21,25 +21,29 @@ public:
 	Rational operator * (const Rational &other) const;
 	Rational operator / (const Rational &other) const;
 
+	Rational operator * (double other) const;
+
 	Rational operator - () const;
 	Rational &operator ++();
 	Rational operator ++(int);
 
 	bool operator == (const Rational &other) const;
 	bool operator != (const Rational &other) const;
+	bool operator > (const Rational &other) const;
+	bool operator < (const Rational &other) const;
 
 	explicit operator int() const;
 	explicit operator double() const;
 
 	friend istream &operator >> (istream &is, Rational &r);
 	friend ostream &operator << (ostream &os, const Rational &r);
+
+	int getNumer() const;
+	int getDenom() const;
+
+	static Rational sqrt(Rational& S);
+	static Rational *getRoots(Rational &a, Rational &b, Rational &c, int &cnt);
 };
 
 int gcd(int a, int b);
-Rational *getRoots(double a, double b, double c, int &cnt);
-
-template <class t>
-double cinArgument(t &number) {
-	cin >> number;
-	return double(number);
-}
+Rational abs(const Rational& r);
