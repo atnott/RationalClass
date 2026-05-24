@@ -1,5 +1,4 @@
-#include "rational.h"
-#include <cmath>
+#include "solver.hpp"
 
 int main() {
     // Rational r1(-1, 3), r2(2, 6), r3(-10, 12);
@@ -12,7 +11,7 @@ int main() {
     Rational a, b, c;
     int cnt = 0;
     cin >> a >> b >> c;
-    Rational *result =  Rational::getRoots(a, b, c, cnt);
+    Rational *result =  getRoots(a, b, c, cnt);
     for (int i = 0; i < cnt; i++) {
         cout << "x" << (i+1) << " = " << result[i] << endl;
     }

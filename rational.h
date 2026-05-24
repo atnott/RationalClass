@@ -3,7 +3,9 @@
 using namespace std;
 
 class Rational {
-	int numer, denom;
+	long long numer;
+	long long denom;
+
 	void simplify();
 public:
     Rational();
@@ -41,8 +43,7 @@ public:
 	int getNumer() const;
 	int getDenom() const;
 
-	static Rational sqrt(Rational& S);
-	static Rational *getRoots(Rational &a, Rational &b, Rational &c, int &cnt);
+	static Rational sqrt(const Rational& S);
 };
 
 int gcd(int a, int b);

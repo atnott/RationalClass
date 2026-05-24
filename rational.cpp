@@ -1,4 +1,4 @@
-#include "rational.h"
+#include"rational.h"
 
 Rational::Rational() {
     numer = 0, denom = 1;
@@ -41,10 +41,20 @@ Rational &Rational::operator *= (const Rational &other) {
 }
 
 Rational &Rational::operator /= (const Rational &other) {
-    int reverseNumer = other.denom, reverseDenom = other.numer;
-    numer = numer * reverseNumer; denom = denom * reverseDenom;
-    simplify();
-    return *this;
+    if (other.numer != 0) {
+        int reverseNumer = other.denom;
+        int reverseDenom = other.numer;
+
+        numer = numer * reverseNumer;
+        denom = denom * reverseDenom;
+
+        simplify();
+        return *this;
+    }
+    else {
+        std::cerr << "деление на 0!" << std::endl;
+        return *this;
+    }
 }
 
 Rational Rational::operator + (const Rational &other) const {
@@ -132,16 +142,14 @@ ostream &operator << (ostream &os, const Rational &r) {
 	return os;
 }
 
-int gcd(int a, int b) {
-    int a1 = abs(a), b1 = abs(b);
-    if (a1 == 0) return b1;
-    if (b1 == 0) return a1;
-    int max = (a1 > b1) ? a1 : b1, min = (a1 < b1) ? a1 : b1;
-    if (max % min == 0) return min;
-    for (int i = min; i > 0; i--) {
-        if (a1 % i == 0 && b1 % i == 0) return i;
+long long gcd(long long a, long long b) {
+    a = std::abs(a);
+    b = std::abs(b);
+    while (b) {
+        a %= b;
+        std::swap(a, b);
     }
-    return 1;
+    return a;
 }
 
 int Rational::getNumer() const {
@@ -156,7 +164,7 @@ void Rational::simplify() {
     if (denom < 0) {
         numer = -numer; denom = -denom;
     }
-    int nod = gcd(numer, denom);
+    long nod = gcd(numer, denom);
     if (nod > 1) {
         numer /= nod; denom /= nod;
     }
@@ -166,7 +174,7 @@ Rational abs(const Rational& r) {
     return Rational(abs(r.getNumer()), r.getDenom());
 }
 
-Rational Rational::sqrt(Rational &S) {
+Rational Rational::sqrt(const Rational &S) {
     if (S.getNumer() < 0) return -1;
     if (S.getNumer() == 0) return 0;
 
@@ -182,31 +190,4 @@ Rational Rational::sqrt(Rational &S) {
         x.simplify();
     } while (abs(temp - x) > 0.001);
     return x;
-}
-
-Rational* Rational::getRoots(Rational &a, Rational &b, Rational &c, int &cnt) {
-    Rational D = b * b - (a * c * 4);
-    if (D.getNumer() < 0) {
-        cout << "not roots" << endl;
-        return nullptr;
-    }
-    if (a.getNumer() != 0) {
-        Rational *roots = new Rational[2];
-        if (D == 0) {
-            cnt = 1;
-            roots[0] = -b / (a * 2);
-        }
-        else {
-            cnt = 2;
-            roots[0] = (-b + Rational::sqrt(D)) / (a * 2);
-            roots[1] = (-b - Rational::sqrt(D)) / (a * 2);
-        }
-        return roots;
-    }
-    else {
-        Rational *roots = new Rational[1];
-        cnt = 1;
-        roots[0] = -c / b;
-        return roots;
-    }
 }
