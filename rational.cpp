@@ -1,4 +1,6 @@
 #include"rational.h"
+#include<climits>
+#include<stdexcept>
 
 Rational::Rational() {
     numer = 0, denom = 1;
@@ -24,8 +26,12 @@ Rational::Rational(double number) {
 }
 
 Rational& Rational::operator += (const Rational &other) {
-    numer = (numer * other.denom + denom * other.numer);
-    denom *= other.denom;
+    long long part1 = safeMultiply(numer, other.denom);
+    long long part2 = safeMultiply(denom, other.numer);
+
+    numer = safeAdd(part1, part2);
+    denom = safeMultiply(denom, other.denom);
+
     simplify();
     return *this;
 }
@@ -35,26 +41,26 @@ Rational &Rational::operator -= (const Rational &other) {
 }
 
 Rational &Rational::operator *= (const Rational &other) {
-    numer = numer * other.numer; denom = denom * other.denom;
+    numer = safeMultiply(numer, other.numer);
+    denom = safeMultiply(denom, other.denom);
     simplify();
     return *this;
 }
 
 Rational &Rational::operator /= (const Rational &other) {
-    if (other.numer != 0) {
-        int reverseNumer = other.denom;
-        int reverseDenom = other.numer;
 
-        numer = numer * reverseNumer;
-        denom = denom * reverseDenom;
+    if (other.numer == 0) {
+        throw std::invalid_argument("Деление на 0");
+    }
 
-        simplify();
-        return *this;
-    }
-    else {
-        std::cerr << "деление на 0!" << std::endl;
-        return *this;
-    }
+    long long reverseNumer = other.denom;
+    long long reverseDenom = other.numer;
+
+    numer = safeMultiply(numer, reverseNumer);
+    denom = safeMultiply(denom, reverseDenom);
+
+    simplify();
+    return *this;
 }
 
 Rational Rational::operator + (const Rational &other) const {
@@ -152,11 +158,11 @@ long long gcd(long long a, long long b) {
     return a;
 }
 
-int Rational::getNumer() const {
+long long Rational::getNumer() const {
     return numer;
 }
 
-int Rational::getDenom() const {
+long long Rational::getDenom() const {
     return denom;
 }
 
@@ -190,4 +196,33 @@ Rational Rational::sqrt(const Rational &S) {
         x.simplify();
     } while (abs(temp - x) > 0.001);
     return x;
+}
+
+long long Rational::safeMultiply(long long a, long long b) {
+    if (a == 0 || b == 0) return 0;
+
+    if (a > 0) {
+        if (b > 0) {
+            if (a > LLONG_MAX / b) throw std::overflow_error("Переполнение long long");
+        }
+        else {
+            if (b < LLONG_MIN / a) throw std::overflow_error("Переполнение long long");
+        }
+    }
+    else {
+        if (b > 0) {
+            if (a < LLONG_MIN / b) throw std::overflow_error("Переполнение long long при умножении!");
+        }
+        else {
+            if (a < LLONG_MAX / b) throw std::overflow_error("Переполнение long long при умножении!");
+        }
+    }
+    return a * b;
+}
+
+long long Rational::safeAdd(long long a, long long b) {
+    if ((b > 0 && a > LLONG_MAX - b) || (b < 0 && a < LLONG_MIN - b)) {
+        throw std::overflow_error("Переполнение long long");
+    }
+    return a + b;
 }

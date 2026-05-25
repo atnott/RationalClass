@@ -7,6 +7,10 @@ class Rational {
 	long long denom;
 
 	void simplify();
+
+	long long safeMultiply(long long a, long long b);
+	long long safeAdd(long long a, long long b);
+
 public:
     Rational();
     Rational(int number);
@@ -40,11 +44,11 @@ public:
 	friend istream &operator >> (istream &is, Rational &r);
 	friend ostream &operator << (ostream &os, const Rational &r);
 
-	int getNumer() const;
-	int getDenom() const;
+	long long getNumer() const;
+	long long getDenom() const;
 
 	static Rational sqrt(const Rational& S);
 };
 
-int gcd(int a, int b);
+int gcd(long long a, long long b);
 Rational abs(const Rational& r);
